@@ -16,9 +16,13 @@ class DrawHitVector : ClickReceiver {
             return;
         }
         drawing = true;
-//vectorObject.GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<MeshRenderer>().enabled = true;
         clickPosition = Input.mousePosition;
         hitPosition = hit.point;
+    }
+
+    void Start() {
+        GetComponent<MeshRenderer>().enabled = false;
     }
 
     void Update() {
@@ -42,7 +46,7 @@ class DrawHitVector : ClickReceiver {
 
         if (Input.GetMouseButtonUp(0)) {
             drawing = false;
-            //vectorObject.GetComponent<MeshRenderer>().enabled = false;
+            GetComponent<MeshRenderer>().enabled = false;
             if (forceReceiver != null) {
                 forceReceiver.receive(new PlatformHit(hitPosition, deltaY * outputScale));
             }
