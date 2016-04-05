@@ -24,10 +24,10 @@ public static class PolyU {
         return PolyK.GetAABB(flat);
     }
 
-    public static uint[] Triangulate(Vector2[] vertices) {
+    public static int[] Triangulate(Vector2[] vertices) {
         var flat = PolyKonvert.toValues(vertices);
         var rawOutput = PolyK.Triangulate(flat);
-        return Array.ConvertAll(rawOutput, item => (uint) item);
+        return Array.ConvertAll(rawOutput, item => (int) item);
     }
 
     public static ICollection<Vector2[]> Slice(Vector2[] vertices, Vector2 p1, Vector2 p2) {
@@ -39,6 +39,49 @@ public static class PolyU {
             triangles.Add(converted);
         }
         return triangles;
+    }
+
+    private static Vector2? GetLineIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2) {
+        float deltaAX = a1.x - a2.x;
+        float deltaBX = b1.x - b2.x;
+        float deltaAY = a1.y - a2.y;
+        float deltaBY = b1.y - b2.y;
+
+        var det = deltaAX * deltaBY - deltaAY * deltaBX;
+        if (det == 0) {
+            return null;
+        }
+
+        var detA = (a1.x * a2.y - a1.y * a2.x);
+        var detB = (b1.x * b2.y - b1.y * b2.x);
+
+        Vector2 intersection = new Vector2(
+                (detA * deltaBX - deltaAX * detB) / det,
+                (detA * deltaBY - deltaAY * detB) / det
+            );
+
+        if (InRect(intersection, a1, a2) && InRect(intersection, b1, b2)) {
+            return intersection;
+        }
+        else {
+            return null;
+        }
+    }
+
+    private static bool InRect(Vector2 a, Vector2 b, Vector2 c) {
+        var minX = Mathf.Min(b.x, c.x);
+        var maxX = Mathf.Max(b.x, c.x);
+        var minY = Mathf.Min(b.y, c.y);
+        var maxY = Mathf.Max(b.y, c.y);
+
+        if (minX == maxX) return (minY <= a.y && a.y <= maxY);
+        if (minY == maxY) return (minX <= a.x && a.x <= maxX);
+
+        return minX <= a.x + 1e-10
+            && a.x - 1e-10 <= maxX
+            && minY <= a.y + 1e-10
+            && a.y - 1e-10 <= maxY;
+
     }
 
     public static bool ContainsPoint(Vector2[] vertices, Vector2 point) {
@@ -56,3 +99,19 @@ public static class PolyU {
         return (PolyKClosestEdge) PolyK.ClosestEdge(flat, point.x, point.y, null);
     }
 }
+
+//class FlaggedVector2 {
+//    public float x { get; set; }
+//    public float y { get; set; }
+//    public bool flag { get; set; }
+
+//    public FlaggedVector2(float x, float y, bool flag) {
+//        this.x = x;
+//        this.y = y;
+//        this.flag = flag;
+//    }
+
+//    public Vector2 toVector2() {
+//        return new Vector2(x, y);
+//    }
+//}

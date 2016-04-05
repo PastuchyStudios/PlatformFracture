@@ -2,7 +2,7 @@
 using System.Collections;
 
 class DebugForceReceiver : ForceReceiver {
-    public override void receive(PlatformHit hit) {
+    public override void receiveHit(PlatformHit hit) {
         Debug.Log(hit);
     }
 }

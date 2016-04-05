@@ -5,11 +5,10 @@ class DrawHitVector : ClickReceiver {
     public float visualScale = 1;
     public float outputScale = 1;
     public float minLength = 0;
-    public ForceReceiver forceReceiver;
 
     private bool drawing = false;
     private Vector3 clickPosition;
-    private Vector3 hitPosition;
+    private RaycastHit hit;
 
     public override void receive(RaycastHit hit) {
         if (drawing) {
@@ -18,7 +17,7 @@ class DrawHitVector : ClickReceiver {
         drawing = true;
         GetComponent<MeshRenderer>().enabled = true;
         clickPosition = Input.mousePosition;
-        hitPosition = hit.point;
+        this.hit = hit;
     }
 
     void Start() {
@@ -37,9 +36,9 @@ class DrawHitVector : ClickReceiver {
             deltaY * visualScale,
             transform.localScale.z);
         Vector3 newPosition = new Vector3(
-            hitPosition.x,
+            hit.point.x,
             newScale.y,
-            hitPosition.z);
+            hit.point.z);
 
         transform.localScale = newScale;
         transform.position = newPosition;
@@ -47,8 +46,9 @@ class DrawHitVector : ClickReceiver {
         if (Input.GetMouseButtonUp(0)) {
             drawing = false;
             GetComponent<MeshRenderer>().enabled = false;
+            ForceReceiver forceReceiver = hit.transform.gameObject.GetComponent<ForceReceiver>();
             if (forceReceiver != null) {
-                forceReceiver.receive(new PlatformHit(hitPosition, deltaY * outputScale));
+                forceReceiver.receiveHit(new PlatformHit(hit.point, deltaY * outputScale));
             }
         }
     }

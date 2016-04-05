@@ -148,7 +148,7 @@ public static class PolyK
 				{
 					var vi = avl[j];
 					if(vi==i0 || vi==i1 || vi==i2) continue;
-					if(_PointointInTriangle(p[2*vi], p[2*vi+1], ax, ay, bx, by, cx, cy)) {earFound = false; break;}
+					if(_PointInTriangle(p[2*vi], p[2*vi+1], ax, ay, bx, by, cx, cy)) {earFound = false; break;}
 				}
 			}
 			if(earFound)
@@ -426,7 +426,7 @@ public static class PolyK
 		}
 	}
 
-	function _PointointInTriangle(px, py, ax, ay, bx, by, cx, cy)
+	function _PointInTriangle(px, py, ax, ay, bx, by, cx, cy)
 	{
 		var v0x = cx-ax;
 		var v0y = cy-ay;
