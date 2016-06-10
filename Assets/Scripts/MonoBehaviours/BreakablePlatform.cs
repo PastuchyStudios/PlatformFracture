@@ -34,7 +34,7 @@ public class BreakablePlatform : ForceReceiver {
     private float highY;
     private float lowY;
 
-    void Start() {
+    public void Start() {
         var mesh = GetComponent<MeshFilter>().mesh;
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
@@ -99,7 +99,7 @@ public class BreakablePlatform : ForceReceiver {
         return centerOfMass;
     }
 
-    public void fracture(Vector3 localHitPoint) {
+    public List<GameObject> fracture(Vector3 localHitPoint) {
         Vector3 centerOfMass = getCenterOfMass();
 
         Vector3 delta = localHitPoint - centerOfMass;
@@ -114,12 +114,27 @@ public class BreakablePlatform : ForceReceiver {
         Vector2 p1 = hitPoint2D + aabbDiagonal.magnitude * perpendicular2D;
         Vector2 p2 = hitPoint2D - aabbDiagonal.magnitude * perpendicular2D;
 
-        sliceWithLine(gameObject, p1, p2, minSliceArea);
+        var shards = sliceWithLine(gameObject, p1, p2, minSliceArea);
+        if (shards.Count > 1) {
+            return shards;
+        }
+
+        // Sliced shard is too small, use alternate slicing
+        Vector2 along2D = (hitPoint2D - removeYComponent(centerOfMass)).normalized;
+        p1 = hitPoint2D + aabbDiagonal.magnitude * along2D;
+        p2 = hitPoint2D - aabbDiagonal.magnitude * along2D;
+        shards = sliceWithLine(gameObject, p1, p2, minSliceArea);
+        if (shards.Count > 1) {
+            return shards;
+        }
+
+        // Something went wrong? Breakpoint here ;)
+        return shards;
     }
 
-    private void shatter(Vector3 localHitPoint) {
+    public List<GameObject> shatter(Vector3 localHitPoint) {
         if (area < 2 * minSliceArea) {
-            return;
+            return new List<GameObject>();
         }
 
         Vector2 hitPoint2D = removeYComponent(localHitPoint);
@@ -129,17 +144,21 @@ public class BreakablePlatform : ForceReceiver {
         Vector2 p2 = hitPoint2D - aabbDiagonal.magnitude * initialFractureVector;
 
         var splittableShards = sliceWithLine(gameObject, p1, p2);
+        List<GameObject> allShards = new List<GameObject>(splittableShards);
         
         while (splittableShards.Count > 0) {
             var splittableArray = splittableShards.ToArray();
             foreach (GameObject splittableShard in splittableArray) {
                 List<GameObject> newShards = shatterSplitShard(splittableShard, hitPoint2D);
+                allShards.AddRange(newShards);
                 splittableShards.Remove(splittableShard);
                 if (newShards.Count > 1) {
                     splittableShards.AddRange(newShards);
                 }
             }
         }
+
+        return allShards;
     }
 
     private List<GameObject> shatterSplitShard(GameObject shardGameObject, Vector2 origin) {
