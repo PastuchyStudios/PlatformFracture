@@ -7,6 +7,7 @@ public class Simulator : MonoBehaviour {
     public BreakablePlatform platformPrefab;
     public string platformTag;
     public int stepIntervalMilliseconds = 500;
+    public SimulationPlan simulationPlan;
     public Transform hammer;
     public float hammerMultiplier = 1;
 
@@ -21,7 +22,7 @@ public class Simulator : MonoBehaviour {
 
     void Start() {
         lastStep = DateTime.Now;
-        generatePlan(margin, stepsPerStage);
+        plan = simulationPlan.getSteps();
     }
 
     void FixedUpdate() {
@@ -81,34 +82,5 @@ public class Simulator : MonoBehaviour {
             shard.transform.parent = transform;
         }
         return shards;
-    }
-
-    private void generatePlan(float margin, int pointCount) {
-        float minCoord = -0.5f + margin;
-        float maxCoord = -minCoord;
-
-        Vector2 minVector = new Vector2(-0.1f, minCoord);
-        Vector2 maxVector = new Vector2(0.1f, maxCoord);
-        addInterpolatedToPlan(minVector, maxVector, pointCount, false);
-
-        minVector = new Vector2(minCoord * 1.2f, minCoord);
-        maxVector = new Vector2(maxCoord * 1.2f, maxCoord);
-        addInterpolatedToPlan(minVector, maxVector, pointCount, false);
-
-        minVector = new Vector2(minCoord, 0);
-        maxVector = new Vector2(maxCoord, 0);
-        addInterpolatedToPlan(minVector, maxVector, pointCount, true);
-    }
-
-    private void addInterpolatedToPlan(Vector2 minVector, Vector2 maxVector, int pointCount, bool shatter) {
-        for (int i = 0; i <= pointCount; i++) {
-            Vector2 point = Vector2.Lerp(minVector, maxVector, i / (float) pointCount);
-            plan.Add(new Step() { point = point, shatter = shatter });
-        }
-    }
-
-    private struct Step {
-        public Vector2 point { get; set; }
-        public bool shatter { get; set; }
     }
 }
