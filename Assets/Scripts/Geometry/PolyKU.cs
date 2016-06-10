@@ -55,7 +55,7 @@ public static class PolyKU {
             }
         }
 
-        if (intersections.Count < 2) {
+        if (intersections.Count != 2) {
             return new List<Vector2[]>() { vertices };
         }
 

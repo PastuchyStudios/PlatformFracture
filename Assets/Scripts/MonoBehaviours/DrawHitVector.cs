@@ -48,7 +48,7 @@ class DrawHitVector : ClickReceiver {
             GetComponent<MeshRenderer>().enabled = false;
             ForceReceiver forceReceiver = hit.transform.gameObject.GetComponent<ForceReceiver>();
             if (forceReceiver != null) {
-                forceReceiver.receiveHit(new PlatformHit(hit.point, deltaY * outputScale));
+                forceReceiver.receiveHit(new AppliedForce(hit.point, deltaY * outputScale));
             }
         }
     }
