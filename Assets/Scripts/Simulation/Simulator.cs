@@ -11,10 +11,6 @@ public class Simulator : MonoBehaviour {
     public Transform hammer;
     public float hammerMultiplier = 1;
 
-    [Range(0.01f, 0.49f)]
-    public float margin;
-    public int stepsPerStage;
-
     private DateTime lastStep;
     private BreakablePlatform platform;
 

@@ -25,8 +25,8 @@ public class LinearPlan : SimulationPlan {
 
     private List<Step> getStepsOnce() {
         List<Step> steps = new List<Step>(stepCount);
-        for (int i = 0; i <= stepCount; i++) {
-            Vector2 point = Vector2.Lerp(point1, point2, i / (float) stepCount);
+        for (int i = 0; i < stepCount; i++) {
+            Vector2 point = Vector2.Lerp(point1, point2, i / (float) (stepCount - 1));
             steps.Add(new Step() { point = point, shatter = shatter });
         }
         return steps;
